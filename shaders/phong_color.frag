@@ -16,5 +16,12 @@ uniform float material_shininess; // n
 out vec4 FragColor;
 
 void main() {
-    FragColor = vec4(material_color, 1.0);
+	float distance = length(light_position - camera_position);
+
+	vec3 lightVector = normalize(light_position - camera_postion);
+
+	float diffuse = max(dot(frag_normal, lightVector), 0.1);
+
+	diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
+    FragColor = vec4(material_color, 1.0) * diffuse;
 }
