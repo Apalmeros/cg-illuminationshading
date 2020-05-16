@@ -19,22 +19,28 @@ out vec3 diffuse;
 out vec3 specular;
 
 void main() {
-	vec3 modelVV = vec3(model_matrix * vec4(vertex_position, 1.0));
-	vec3 modelVN = normalize((transpose(inverse(mat3(model_matrix))) * vertex_normal));
 
-
-	vec3 light_source = normalize(light_position - modelVV);
-	vec3 viewV = normalize(camera_position - modelVV);
-	vec3 reflect = normalize(-reflect(light_source,modelVN));
-
+	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(vertex_position, 1.0);
+	
 	//ambient calc
 	ambient = light_ambient;
+	
+	vec3 modelVV = vec3(model_matrix * vec4(vertex_position, 1.0));
+	vec3 modelVN = normalize((transpose(inverse(mat3(model_matrix))) * vertex_normal));
+	//vec3 modelVN = normalize(vec3(inverse(transpose(mat3(model_matrix))) * vertex_normal));
 
 	//diffuse calc
+	vec3 light_source = normalize(light_position - modelVV);
 	diffuse = light_position * max(dot(modelVN,light_source), 0.0); 
-
+	
+	
 	//spec calc
+	vec3 viewV = normalize(camera_position - modelVV);
+	vec3 reflect = normalize(-reflect(light_source,modelVN));
+	//vec3 reflect = reflect(-light_direction, v_normal); 
 	specular = light_color * pow(max(dot(reflect,viewV), 0.0), 0.3 * material_shininess);
 
-    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(vertex_position, 1.0);
+	
+
+
 }
